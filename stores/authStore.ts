@@ -3,7 +3,7 @@ import { auth } from "@configs/firebase";
 import { onAuthStateChanged, Unsubscribe } from "firebase/auth";
 
 interface User {
-  uuid: string;
+  uid: string;
   email: string | null;
 }
 
@@ -24,7 +24,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         const user: User = {
-          uuid: firebaseUser.uid,
+          uid: firebaseUser.uid,
           email: firebaseUser.email,
         };
         set({ user });

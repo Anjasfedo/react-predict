@@ -21,7 +21,7 @@ function App() {
   }, [initialAuthListener]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-between max-w-5xl mx-auto relative">
+    <div className="flex min-h-screen flex-col items-center space-y-5 max-w-5xl mx-auto relative bg-slate-800 py-2 text-white font-semibold">
       <BrowserRouter>
         <div className="flex">
           <nav>

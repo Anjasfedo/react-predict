@@ -1,9 +1,79 @@
-import React from 'react'
+import { auth } from "@configs/firebase";
+import { zodResolver } from "@hookform/resolvers/zod";
+import useAuthStore from "@stores/authStore";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
+import { z } from "zod";
+import {
+  FormControl,
+  FormLabel,
+  Input,
+  FormErrorMessage,
+  Button,
+  Heading,
+} from "@chakra-ui/react";
 
-const Login = () => {
+const schema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+type LoginFormInputs = z.infer<typeof schema>;
+
+const Login: React.FC = () => {
+  const setUser = useAuthStore((state) => state.setUser);
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormInputs>({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit = async ({ email, password }: LoginFormInputs) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      setUser({
+        uid: userCredential.user.uid,
+        email: userCredential.user.email,
+      });
+      navigate("/dashboard");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <div>Login</div>
-  )
-}
+    <div>
+      <Heading as="h2" size="md" mb={4}>
+        Login
+      </Heading>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <FormControl isInvalid={!!errors.email}>
+          <FormLabel>Email</FormLabel>
+          <Input {...register("email")} />
+          <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
+        </FormControl>
+        <FormControl isInvalid={!!errors.password} mt={4}>
+          <FormLabel>Password</FormLabel>
+          <Input type="password" {...register("password")} />
+          <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
+        </FormControl>
+        <Button type="submit" colorScheme="blue" mt={4}>
+          Login
+        </Button>
+        <p>
+          Don't have an account? <Link to="/register">Register</Link>
+        </p>
+      </form>
+    </div>
+  );
+};
 
-export default Login
+export default Login;
