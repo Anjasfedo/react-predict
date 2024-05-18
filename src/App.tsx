@@ -7,15 +7,25 @@ import Dashboard from "@src/components/Dashboard";
 import Home from "@src/components/Home";
 
 function App() {
+  const initialAuthListener = useAuthStore(
+    (state) => state.initializeAuthListener
+  );
+
+  useEffect(() => {
+    const unsubscribe = initialAuthListener();
+    return () => {
+      unsubscribe(); // Call the unsubscribe function
+    };
+  }, [initialAuthListener]);
 
   return (
     <>
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/" element={<Home />} />
+          <Route path="/login" Component={Login} />
+          <Route path="/register" Component={Register} />
+          <Route path="/dashboard" Component={Dashboard} />
+          <Route path="/" Component={Home} />
         </Routes>
       </BrowserRouter>
     </>
