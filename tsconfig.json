@@ -24,6 +24,7 @@
       "@src/*": ["src/*"],
       "@configs/*": ["configs/*"],
       "@schemas/*": ["schemas/*"],
+      "@stores/*": ["stores/*"],
   }
   },
   "include": ["src", "configs"],
