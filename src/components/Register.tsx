@@ -59,11 +59,11 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col items-center">
       <Heading as="h2" size="md" mb={4}>
         Register
       </Heading>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
         <FormControl isInvalid={!!errors.email}>
           <FormLabel>Email</FormLabel>
           <Input {...register("email")} />

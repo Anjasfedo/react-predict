@@ -40,7 +40,7 @@ function App() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center relative space-y-5 max-w-5xl mx-auto py-2 font-semibold">
+    <div className="flex min-h-screen flex-col items-center relative space-y-5 max-w-5xl mx-auto py-10 font-semibold">
       <BrowserRouter>
         <nav>
           <div className="flex space-x-2 items-center">
