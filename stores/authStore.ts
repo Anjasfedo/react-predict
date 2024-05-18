@@ -1,6 +1,7 @@
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { create } from "zustand";
 
+import { create } from "zustand";
+import {auth} from "@configs/firebase"
+import { onAuthStateChanged } from "firebase/auth";
 interface User {
   uuid: string;
   email: string | null;
@@ -11,7 +12,7 @@ interface AuthState {
   getUser: () => User | null;
   setUser: (user: User) => void;
   clearUser: () => void;
-  iniinitializeAuthListener: () => void;
+  initializeAuthListener: () => void;
 }
 
 const useAuthStore = create<AuthState>((set, get) => ({
@@ -19,8 +20,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
   getUser: () => get().user,
   setUser: (user) => set({ user }),
   clearUser: () => set({ user: null }),
-  iniinitializeAuthListener: () => {
-    const auth = getAuth();
+  initializeAuthListener: () => {
     onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         const user: User = {

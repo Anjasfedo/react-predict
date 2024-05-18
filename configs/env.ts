@@ -1,4 +1,4 @@
-import { envSchema } from "@schemas/schema";
+import { envSchema } from "../schemas/schema";
 
 const ENV = envSchema.parse(process.env);
 

@@ -24,9 +24,9 @@
       "@src/*": ["src/*"],
       "@configs/*": ["configs/*"],
       "@schemas/*": ["schemas/*"],
-      "@stores/*": ["stores/*"],
-  }
+      "@stores/*": ["stores/*"]
+    },
   },
-  "include": ["src", "configs"],
+  "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
