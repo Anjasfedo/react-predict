@@ -14,6 +14,7 @@ import {
   Button,
   Heading,
 } from "@chakra-ui/react";
+import { postDataGetToken } from "@libs/fetchApi";
 
 const schema = z
   .object({
@@ -48,13 +49,22 @@ const Register: React.FC = () => {
         email,
         password
       );
+
+      await postDataGetToken(
+        { uid: userCredential.user.uid },
+        "/v1/auths/token/"
+      );
+
       setUser({
         uid: userCredential.user.uid,
         email: userCredential.user.email,
       });
+
       navigate("/dashboard");
-    } catch (error) {
-      console.error(error);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error(error.message);
     }
   };
 

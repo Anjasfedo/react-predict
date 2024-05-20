@@ -13,6 +13,7 @@ import {
   Button,
   Heading,
 } from "@chakra-ui/react";
+import { postDataGetToken } from "@libs/fetchApi";
 
 const schema = z.object({
   email: z.string().email("Invalid email address"),
@@ -40,11 +41,19 @@ const Login: React.FC = () => {
         email,
         password
       );
+
+      await postDataGetToken(
+        { uid: userCredential.user.uid },
+        "/v1/auths/token/"
+      );
+
       setUser({
         uid: userCredential.user.uid,
         email: userCredential.user.email,
       });
+
       navigate("/dashboard");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (
         error.code === "auth/invalid-email" ||
@@ -66,7 +75,7 @@ const Login: React.FC = () => {
           message: "Invalid credentials",
         });
       }
-      console.error(error);
+      console.error(error.message);
     }
   };
 

@@ -24,8 +24,10 @@
       "@src/*": ["src/*"],
       "@configs/*": ["configs/*"],
       "@schemas/*": ["schemas/*"],
-      "@stores/*": ["stores/*"]
+      "@stores/*": ["stores/*"],
+      "@libs/*": ["libs/*"]
     },
+    "types": ["vite/client"]
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
