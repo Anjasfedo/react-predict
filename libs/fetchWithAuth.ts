@@ -1,4 +1,4 @@
-import useJwtStore from "../stores/jwtStore";
+import { auth } from "@configs/firebase";
 
 interface FetchOptions extends RequestInit {
   headers?: Record<string, string>;
@@ -9,8 +9,8 @@ const fetchWithAuth = async (
   options: FetchOptions = {}
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any> => {
-  const token = useJwtStore.getState().token;
-
+  const token = await auth.currentUser?.getIdToken();
+  
   const response = await fetch(url, {
     ...options,
     headers: {

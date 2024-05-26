@@ -13,7 +13,6 @@ import {
   Button,
   Heading,
 } from "@chakra-ui/react";
-import { postDataGetToken } from "@libs/fetchApi";
 
 const schema = z.object({
   email: z.string().email("Invalid email address"),
@@ -40,11 +39,6 @@ const Login: React.FC = () => {
         auth,
         email,
         password
-      );
-
-      await postDataGetToken(
-        { uid: userCredential.user.uid },
-        "/v1/auths/token/"
       );
 
       setUser({

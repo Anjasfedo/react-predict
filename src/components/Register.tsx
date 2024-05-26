@@ -14,7 +14,6 @@ import {
   Button,
   Heading,
 } from "@chakra-ui/react";
-import { postDataGetToken } from "@libs/fetchApi";
 
 const schema = z
   .object({
@@ -48,11 +47,6 @@ const Register: React.FC = () => {
         auth,
         email,
         password
-      );
-
-      await postDataGetToken(
-        { uid: userCredential.user.uid },
-        "/v1/auths/token/"
       );
 
       setUser({
