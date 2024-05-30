@@ -1,7 +1,7 @@
 import { auth } from "@configs/firebase";
 import { zodResolver } from "@hookform/resolvers/zod";
 import useAuthStore from "@stores/authStore";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
@@ -73,6 +73,23 @@ const Login: React.FC = () => {
     }
   };
 
+    const handleGoogleLogin = async () => {
+      try {
+        const provider = new GoogleAuthProvider();
+        const userCredential = await signInWithPopup(auth, provider);
+
+        setUser({
+          uid: userCredential.user.uid,
+          email: userCredential.user.email,
+        });
+
+        navigate("/dashboard");
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        console.error("Google login error:", error.message);
+      }
+    };
+
   return (
     <div className="flex flex-col items-center">
       <Heading as="h2" size="md" mb={4}>
@@ -96,6 +113,9 @@ const Login: React.FC = () => {
           Don't have an account? <Link to="/register">Register</Link>
         </p>
       </form>
+      <Button onClick={handleGoogleLogin} colorScheme="green" mt={4}>
+        Google
+      </Button>
     </div>
   );
 };

@@ -1,10 +1,11 @@
 import {
   Button,
+  Checkbox,
   FormControl,
+  FormErrorMessage,
   FormLabel,
-  Radio,
-  RadioGroup,
   Stack,
+  Spinner,
 } from "@chakra-ui/react";
 import { postData } from "@libs/fetchApi";
 import { useState } from "react";
@@ -40,16 +41,42 @@ const Dashboard = () => {
   const {
     register,
     handleSubmit,
+    formState: { isSubmitting, errors },
   } = useForm<FormData>();
-  const [predictedLevel, setPredictedLevel] = useState(null);
+  const [predictedLevel, setPredictedLevel] = useState<string | null>(null);
+  const [checkedValues, setCheckedValues] = useState<Record<string, string>>(
+    {}
+  );
 
-  const onSubmit: SubmitHandler<FormData> = async (data) => {
+  const onSubmit: SubmitHandler<FormData> = async () => {
     try {
-      const response = await postData({ ...data }, "/api/predict/");
+      // Check if any checkbox is not selected
+      if (Object.values(checkedValues).some((value) => value === "")) {
+        return;
+      }
+
+      // Start the loading state
+      setPredictedLevel(null);
+
+      const response = await postData(
+        {
+          features_list: [
+            Object.values(checkedValues).map((value) => parseInt(value)),
+          ],
+        },
+        "/api/predict/"
+      );
       setPredictedLevel(response.predicted_levels[0]);
     } catch (error) {
       console.error("Error making prediction:", error);
     }
+  };
+
+  const handleCheckboxChange = (feature: keyof FormData, value: string) => {
+    setCheckedValues((prevCheckedValues) => ({
+      ...prevCheckedValues,
+      [feature]: value,
+    }));
   };
 
   return (
@@ -58,25 +85,37 @@ const Dashboard = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={4}>
           {featureNames.map((feature) => (
-            <FormControl key={feature}>
+            <FormControl key={feature} isInvalid={!!errors[feature]}>
               <FormLabel>{feature.toUpperCase()}</FormLabel>
-              <RadioGroup
-                name={feature}
-                defaultValue="1"
-                {...register(feature)}
-              >
-                <Stack direction="row">
-                  <Radio value="1">1</Radio>
-                  <Radio value="2">2</Radio>
-                  <Radio value="3">3</Radio>
-                  <Radio value="4">4</Radio>
-                </Stack>
-              </RadioGroup>
+              <Stack direction="row">
+                {[1, 2, 3, 4].map((value) => (
+                  <Checkbox
+                    key={value}
+                    value={value.toString()}
+                    {...register(feature, { required: true })}
+                    isChecked={checkedValues[feature] === value.toString()}
+                    onChange={() =>
+                      handleCheckboxChange(feature, value.toString())
+                    }
+                  >
+                    {value}
+                  </Checkbox>
+                ))}
+              </Stack>
+              <FormErrorMessage>
+                {errors[feature]?.type === "required" &&
+                  `${feature} is required`}
+              </FormErrorMessage>
             </FormControl>
           ))}
         </Stack>
-        <Button mt={4} colorScheme="teal" type="submit">
-          Predict
+        <Button
+          mt={4}
+          colorScheme="teal"
+          type="submit"
+          isLoading={isSubmitting}
+        >
+          {isSubmitting ? <Spinner size="sm" color="white" /> : "Predict"}
         </Button>
       </form>
       {predictedLevel && (

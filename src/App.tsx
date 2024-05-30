@@ -13,7 +13,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 const queryClient = new QueryClient();
 
 function App() {
-  const { colorMode, toggleColorMode } = useColorMode();
+  const { toggleColorMode } = useColorMode();
 
   const initialAuthListener = useAuthStore(
     (state) => state.initializeAuthListener
