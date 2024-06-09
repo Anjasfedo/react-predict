@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { database } from "@configs/firebase";
 import type { Todo } from "@stores/todoStore";
 import useTodoStore from "@stores/todoStore";
-import { off, onValue, ref, set } from "firebase/database";
+import { off, onValue, push, ref } from "firebase/database";
 const ydoc = new Y.Doc();
 const roomName = "my-room-name";
 const provider = new IndexeddbPersistence(roomName, ydoc);
@@ -14,43 +14,53 @@ provider.on("synced", () => {
 });
 
 const Dashboard = () => {
+  const todos = useTodoStore((state) => state.todos);
+
   useEffect(() => {
-    // Sync todos with Firebase
-    const todosRef = ref(database, "todos");
-    onValue(todosRef, (snapshot) => {
-      const todosData: Todo[] = snapshot.val()
-        ? Object.values(snapshot.val())
-        : [];
-      todosData.forEach((todo: Todo) => {
-        useTodoStore.getState().addTodo(todo);
-      });
-    });
+    const query = ref(database, "todos");
+    return onValue(query, (snapshot) => {
+      const data = snapshot.val();
 
-    // Sync todos with Yjs
-    const type = ydoc.getMap("todos");
-    type.observeDeep(() => {
-      const newTodos = Array.from(type.values()) as Todo[];
-      useTodoStore.setState({ todos: newTodos });
+      if (snapshot.exists()) {
+        Object.values(data).map((todo) => {
+          useTodoStore.getState().addTodo(todo);
+        });
+      }
     });
-
-    return () => {
-      off(todosRef, "value");
-    };
   }, []);
 
-  const handleAddTodo = (text: string) => {
-    const newTodo: Todo = {
-      id: Date.now(),
+  const handleAddTodo = async (text: string) => {
+    const newTodo = {
       text,
       completed: false,
     };
 
-    set(ref(database, `todos/${newTodo.id}`), newTodo);
-
-    const type = ydoc.getMap("todos");
-    type.set(newTodo.id.toString(), newTodo);
+    const newTodoRef = await push(ref(database, "todos"), newTodo);
+    const newTodoKey = newTodoRef.key;
+    if (newTodoKey) {
+      const type = ydoc.getMap("todos");
+      type.set(newTodoKey, newTodo);
+    }
+    
   };
-  return <div className="App"></div>;
+  return (
+    <div className="App">
+      <h1>Todo App</h1>
+      <input
+        type="text"
+        onChange={(e) => handleAddTodo(e.target.value)}
+        placeholder="Enter todo text..."
+      />
+      <ul>
+        {todos.map((todo) => (
+          <li key={todo.id}>
+            {todo.text}
+            {/* <button onClick={() => handleDeleteTodo(todo.id)}>Delete</button> */}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 };
 
 export default Dashboard;
